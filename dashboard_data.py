@@ -130,6 +130,17 @@ def main():
     lstm_block = dict(test=lstm_eval["test"], val=lstm_eval["val"],
                       threshold=lstm_eval["stress_ks_threshold"])
 
+    # ---- mosaic map products (AOI-gridded runs; advisory_maps writes them) ----
+    mosaics = None
+    mos_path = os.path.join(sc.OUT_DIR, "maps", "mosaics.json")
+    if os.path.exists(mos_path):
+        with open(mos_path) as f:
+            mosaics = json.load(f)
+    # fixed per-crop colors (same as advisory_maps.CROP_COLORS / the web UI)
+    crop_colors = {sc.SCHEME[i]: c for i, c in enumerate(
+        ["#c98500", "#d95926", "#9085e9", "#898781",
+         "#199e70", "#008300", "#3987e5", "#d55181"])}
+
     # ---- representative water-balance schedule (median cell, per crop) ----
     from collections import Counter
     modal_cell = Counter(chip_cell.values()).most_common(1)[0][0]
@@ -207,6 +218,7 @@ def main():
         weather=dict(et0=et0, rain=rain, tmean=tmean, cell=modal_cell),
         deficit=deficit_block, sowing=sowing_block, lstm=lstm_block,
         schedules=schedules, chips=chips, fields=fields,
+        mosaics=mosaics, crop_colors=crop_colors,
         peak_dekad=int((level >= 2).sum(0).argmax()))
 
     out = os.path.join(sc.OUT_DIR, "dashboard_data.json")

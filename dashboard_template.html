@@ -79,6 +79,10 @@
     color: var(--ink); box-shadow: 0 4px 16px rgba(0,0,0,0.18); opacity: 0; transition: opacity .08s; }
   .tip b { font-weight: 600; }
   .note { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  .note b { color: var(--ink-2); }
+  .warn { color: var(--lv3); font-weight: 600; }
+  .mosaic-wrap img { width: 100%; display: block; border-radius: 8px;
+    border: 1px solid var(--border); }
   .pill { display:inline-block; font-size:11px; padding:1px 7px; border-radius:20px;
     background: var(--surface-2); color: var(--ink-2); border:1px solid var(--border); }
   table.dt { border-collapse: collapse; width: 100%; font-size: 12px; margin-top: 6px; }
@@ -94,6 +98,22 @@
   <div class="sub" id="sub"></div>
 
   <div class="kpis" id="kpis"></div>
+
+  <div class="note" style="margin:-6px 0 18px">
+    <b>Reading the numbers:</b> <b>Ks</b> is the FAO-56 crop water-stress factor
+    &mdash; 1.00 means the crop is fully watered, values below ~0.85 mean growth is
+    being slowed by lack of water. <b>MAE</b> (mean absolute error) is the average
+    gap between two estimates &mdash; smaller is better. <b>R&sup2;</b> measures how
+    well one estimate tracks another: 1.00 is perfect agreement, 0 is no better
+    than guessing the average, and a negative value means the two actively disagree.
+  </div>
+
+  <div class="card" id="cropmap-card" style="display:none">
+    <h2>Crop-type map <span class="pill">field-level, 10 m</span></h2>
+    <div class="mosaic-wrap"><img id="cropmap-img" alt="Field-level crop-type map"></div>
+    <div class="legend" id="crop-legend"></div>
+    <div class="note" id="cropmap-note"></div>
+  </div>
 
   <div class="card">
     <h2>Regional advisory over the season</h2>
@@ -139,9 +159,11 @@
       <label>Dekad:</label>
       <div class="dekbtns" id="dekbtns"></div>
     </div>
+    <div class="mosaic-wrap" id="map-img-wrap" style="display:none">
+      <img id="map-img" alt="Field-level advisory map"></div>
     <div id="map"></div>
     <div class="legend" id="map-legend"></div>
-    <div class="note">Each dot is a 256&times;256 chip (~2.5&nbsp;km), colored by its worst in-season field advisory for the selected dekad. Hover for detail.</div>
+    <div class="note" id="map-note">Each dot is a 256&times;256 chip (~2.5&nbsp;km), colored by its worst in-season field advisory for the selected dekad. Hover for detail.</div>
   </div>
 
   <div class="card">
@@ -175,15 +197,15 @@
         </div></div>
     </div>
     <div id="f-strip" style="margin-top:12px"></div>
-    <div class="note">Advisory ribbon shows the fused level per dekad. VCI is a single-season percentile against same-crop neighbours (no multi-year climatology available); soil-moisture proxy is Sentinel-1 VV scaled between the field's seasonal dry and wet references. The LSTM Ks is predicted from the spectral/SAR series alone &mdash; no weather inputs &mdash; so it can stand in for the water balance where meteorological data is missing.</div>
+    <div class="note" id="f-note">Advisory ribbon shows the fused level per dekad. VCI is a single-season percentile against same-crop neighbours (no multi-year climatology available); soil-moisture proxy is Sentinel-1 VV scaled between the field's seasonal dry and wet references. <b>The two Ks lines answer different questions</b>: the FAO-56 line is the physics water balance's estimate of how stressed this crop would be on rain alone (the advisory's driver); the LSTM line is an AI estimate of the same quantity made purely from what the satellite sees, for use where weather data is missing. When the satellite line sits well above the water-balance line, the field is likely being irrigated &mdash; the crop looks healthier than rain alone could explain.</div>
   </div>
 
   <div class="note" style="margin-top:6px">
-    Advisory fuses a stage-aware FAO-56 crop-water balance (weather-driven demand, effective rainfall, root-zone depletion vs. the crop's readily-available-water trigger) with observed spectral stress (NDVI anomaly, VCI, NDMI, Sentinel-1 soil moisture). Crop identity per field comes from the project's 8-class classifier; growth-stage timing is anchored on each field's own NDVI green-up sowing date. Advisory rules are transparent, not learned; the LSTM runs alongside as a satellite-only stress estimator for weather-sparse operation. All detection steps are causal (no future dekads used), so the pipeline can run mid-season.
+    Advisory fuses a stage-aware FAO-56 crop-water balance (weather-driven demand, effective rainfall, root-zone depletion vs. the crop's readily-available-water trigger) with observed spectral stress (NDVI anomaly, VCI, NDMI, Sentinel-1 soil moisture). Crop identity per field comes from the project's 8-class classifier; growth-stage timing is anchored on each field's own NDVI green-up sowing date. <b>The advisory level is set by fixed, auditable if-then rules, not a learned model</b>: &ldquo;Irrigation advised&rdquo; fires when the root-zone bucket reaches the crop's readily-available-water trigger in a water-sensitive stage, or when moderate spectral stress coincides with a dry Sentinel-1 soil signal or Ks&nbsp;&lt;&nbsp;0.85; &ldquo;Severe&rdquo; when Ks&nbsp;&lt;&nbsp;0.85 and strong spectral stress coincide in a sensitive stage; &ldquo;Watch&rdquo; at 80% of the trigger depletion or mild spectral stress. The LSTM runs alongside as a satellite-only stress estimator for weather-sparse operation. All detection steps are causal (no future dekads used), so the pipeline can run mid-season.
   </div>
-</div>
 
-<div class="tip" id="tip"></div>
+  <div class="tip" id="tip"></div>
+</div>
 
 <script id="payload" type="application/json">__DATA__</script>
 <script>
@@ -207,6 +229,9 @@
 
   $("#sub").textContent = `${D.region} · ${D.season}`;
   $("#wcell").textContent = D.weather.cell.replace("_", ", ");
+  // Images live next to this file (maps/...) when opened locally, but behind
+  // /api/jobs/{id}/files/ when served by the AOI web service.
+  const IMG_BASE = location.pathname.endsWith("/dashboard") ? "files/" : "";
 
   // ---------------- KPIs ----------------
   const lastPeak = D.peak_dekad;
@@ -220,7 +245,9 @@
     [D.dekad_labels[lastPeak], `peak stress &mdash; <b>${advisedPeak}</b> fields advised`],
     [(D.sowing.detected_frac*100).toFixed(0) + "%", "of sowing dates observed from NDVI green-up"],
     [(D.deficit.season_total_m3/1e6).toFixed(1) + " Mm³", `season water deficit over <b>${Math.round(D.deficit.cropped_area_ha).toLocaleString()}</b> ha cropped`],
-    ["R² " + D.lstm.test.r2.toFixed(2), `LSTM stress model vs FAO-56 Ks (held-out chips, MAE ${D.lstm.test.mae.toFixed(3)})`],
+    ["R² " + D.lstm.test.r2.toFixed(2),
+      `how closely the satellite-only AI stress estimate tracks the physics water balance (1.00 = perfect; average gap ${D.lstm.test.mae.toFixed(2)} Ks units)` +
+      (D.lstm.test.r2 < 0.5 ? `<br><span class="warn">low agreement here — the AI estimate is unreliable for this area/season; the advisory uses the water balance only</span>` : "")],
   ];
   $("#kpis").innerHTML = kpis.map(k =>
     `<div class="kpi"><div class="v">${k[0]}</div><div class="l">${k[1]}</div></div>`).join("");
@@ -383,6 +410,18 @@
       (wm?` Wheat median <b>${wm.median}</b> vs calendar default ${wm.calendar}; spread of several weeks drives large differences in irrigation need.`:"");
   })();
 
+  // ---------------- crop-type map (AOI mosaic runs) ----------------
+  if (D.mosaics && D.crop_colors) {
+    $("#cropmap-card").style.display = "";
+    $("#cropmap-img").src = IMG_BASE + D.mosaics.crop_map;
+    $("#crop-legend").innerHTML = Object.entries(D.crops)
+      .sort((a, b) => b[1].n - a[1].n)
+      .map(([name, c]) => `<span><span class="sw" style="background:${D.crop_colors[name]}"></span>${name} (${c.n.toLocaleString()})</span>`)
+      .join("");
+    $("#cropmap-note").innerHTML =
+      `Every field, colored by the crop the classifier assigned it, over the March NDVI backdrop (grey = not a field / no prediction). Covers ${D.mosaics.km[0]}&times;${D.mosaics.km[1]} km centred on ${D.mosaics.approx_center[1]}&deg;N, ${D.mosaics.approx_center[0]}&deg;E. GIS-ready per-chip GeoTIFFs are in <code>maps/crop_geotiff/</code>.`;
+  }
+
   // ---------------- map ----------------
   let curDek = D.peak_dekad;
   const chips = Object.entries(D.chips);
@@ -390,6 +429,14 @@
   const mnx=Math.min(...lons),mxx=Math.max(...lons),mny=Math.min(...lats),mxy=Math.max(...lats);
   const mapHost=$("#map");
   function drawMap(){
+    if (D.mosaics) {           // field-level overlay instead of chip dots
+      $("#map-img-wrap").style.display = "";
+      mapHost.style.display = "none";
+      $("#map-img").src = IMG_BASE + D.mosaics.advisory[curDek];
+      $("#map-note").innerHTML =
+        `Field-level advisory for <b>${D.dekad_labels[curDek]}</b>, drawn as translucent colors over the March NDVI backdrop. Pick a dekad above to step through the season; GIS-ready GeoTIFFs are in <code>maps/geotiff/</code>.`;
+      return;
+    }
     const w=720,h=380,pad={l:34,r:10,t:8,b:28};
     const f=frame(mapHost,w,h,pad);
     const sx=v=>f.x0+(v-mnx)/(mxx-mnx)*f.W, sy=v=>f.y0-(v-mny)/(mxy-mny)*f.H;
