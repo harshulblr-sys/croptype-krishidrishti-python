@@ -1,0 +1,23 @@
+# datasets / heavy artifacts — code and docs only in git
+*.tif
+*.tiff
+*.npz
+*.pt
+*.joblib
+*.zip
+*.tar
+*.pdf
+*.geojson
+Collocated_*/
+Extracted_dataset*/
+Satellite_data/
+agrifieldnet_data/
+Pilot_Area_*/
+weather/
+runs/
+aoi_runs/
+moisture_stress/
+__pycache__/
+node_modules/
+frontend/capture.jpg
+*.log

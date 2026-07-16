@@ -1,0 +1,244 @@
+{
+ "bbox": [
+  68.0,
+  8.0,
+  97.5,
+  37.0
+ ],
+ "validity": null,
+ "n_collections_intersecting": 12,
+ "collections_per_crop": {
+  "Wheat": 3,
+  "Rice": 8,
+  "Mustard/Rapeseed (oilseed)": 6
+ },
+ "samples_india_specific": {
+  "Wheat": 2001,
+  "Rice": 306,
+  "Mustard/Rapeseed (oilseed)": 204
+ },
+ "samples_all_intersecting": {
+  "Wheat": 26883,
+  "Rice": 110308,
+  "Mustard/Rapeseed (oilseed)": 3070
+ },
+ "mustard_greens": 0,
+ "collections": [
+  {
+   "collectionId": "2021_mmr_gintingli_point_110",
+   "featureCount": 145258,
+   "type": "Point",
+   "accessType": "Public",
+   "india_specific": false,
+   "bbox": [
+    94.0,
+    14.2,
+    100.63,
+    22.29
+   ],
+   "crop_counts": {
+    "Wheat": 0,
+    "Rice": 72629,
+    "Mustard/Rapeseed (oilseed)": 0
+   }
+  },
+  {
+   "collectionId": "2018_glo_glance_point_100",
+   "featureCount": 128141,
+   "type": "Point",
+   "accessType": "Public",
+   "india_specific": false,
+   "bbox": [
+    -173.68,
+    -55.09,
+    177.89,
+    80.94
+   ],
+   "crop_counts": {
+    "Wheat": 0,
+    "Rice": 0,
+    "Mustard/Rapeseed (oilseed)": 0
+   }
+  },
+  {
+   "collectionId": "2023_pak_adbkharif_point_110",
+   "featureCount": 92763,
+   "type": "Point",
+   "accessType": "Public",
+   "india_specific": false,
+   "bbox": [
+    64.76,
+    24.42,
+    74.88,
+    35.62
+   ],
+   "crop_counts": {
+    "Wheat": 0,
+    "Rice": 36494,
+    "Mustard/Rapeseed (oilseed)": 3
+   }
+  },
+  {
+   "collectionId": "2023_pak_adbrabi_point_110",
+   "featureCount": 43807,
+   "type": "Point",
+   "accessType": "Public",
+   "india_specific": false,
+   "bbox": [
+    66.0,
+    24.13,
+    74.71,
+    35.35
+   ],
+   "crop_counts": {
+    "Wheat": 24882,
+    "Rice": 1,
+    "Mustard/Rapeseed (oilseed)": 2787
+   }
+  },
+  {
+   "collectionId": "2020_glo_glance_point_100",
+   "featureCount": 13228,
+   "type": "Point",
+   "accessType": "Public",
+   "india_specific": false,
+   "bbox": [
+    -179.61,
+    -54.95,
+    179.79,
+    79.91
+   ],
+   "crop_counts": {
+    "Wheat": 0,
+    "Rice": 0,
+    "Mustard/Rapeseed (oilseed)": 0
+   }
+  },
+  {
+   "collectionId": "2019_glo_glance_point_100",
+   "featureCount": 8984,
+   "type": "Point",
+   "accessType": "Public",
+   "india_specific": false,
+   "bbox": [
+    -179.46,
+    -43.03,
+    178.29,
+    77.92
+   ],
+   "crop_counts": {
+    "Wheat": 0,
+    "Rice": 0,
+    "Mustard/Rapeseed (oilseed)": 0
+   }
+  },
+  {
+   "collectionId": "2021_glo_ewocval_poly_111",
+   "featureCount": 6412,
+   "type": "Polygon",
+   "accessType": "Public",
+   "india_specific": false,
+   "bbox": [
+    -114.98,
+    -46.05,
+    167.92,
+    62.56
+   ],
+   "crop_counts": {
+    "Wheat": 0,
+    "Rice": 810,
+    "Mustard/Rapeseed (oilseed)": 74
+   }
+  },
+  {
+   "collectionId": "2023_npl_cimmyt_poly_110",
+   "featureCount": 2675,
+   "type": "Polygon",
+   "accessType": "Public",
+   "india_specific": true,
+   "bbox": [
+    80.14,
+    26.99,
+    86.24,
+    29.26
+   ],
+   "crop_counts": {
+    "Wheat": 1239,
+    "Rice": 18,
+    "Mustard/Rapeseed (oilseed)": 203
+   }
+  },
+  {
+   "collectionId": "2018_ind_cgiargardian_point_110",
+   "featureCount": 762,
+   "type": "Point",
+   "accessType": "Public",
+   "india_specific": true,
+   "bbox": [
+    74.67,
+    28.97,
+    77.71,
+    30.9
+   ],
+   "crop_counts": {
+    "Wheat": 762,
+    "Rice": 0,
+    "Mustard/Rapeseed (oilseed)": 0
+   }
+  },
+  {
+   "collectionId": "2021_lka_faowapor2_poly_111",
+   "featureCount": 721,
+   "type": "Polygon",
+   "accessType": "Public",
+   "india_specific": true,
+   "bbox": [
+    80.22,
+    8.13,
+    80.53,
+    8.61
+   ],
+   "crop_counts": {
+    "Wheat": 0,
+    "Rice": 127,
+    "Mustard/Rapeseed (oilseed)": 0
+   }
+  },
+  {
+   "collectionId": "2022_glo_ewocval_poly_111",
+   "featureCount": 689,
+   "type": "Polygon",
+   "accessType": "Public",
+   "india_specific": false,
+   "bbox": [
+    -103.84,
+    -38.69,
+    142.2,
+    59.16
+   ],
+   "crop_counts": {
+    "Wheat": 0,
+    "Rice": 68,
+    "Mustard/Rapeseed (oilseed)": 2
+   }
+  },
+  {
+   "collectionId": "2021_lka_faowapor1_poly_111",
+   "featureCount": 529,
+   "type": "Polygon",
+   "accessType": "Public",
+   "india_specific": true,
+   "bbox": [
+    80.24,
+    8.13,
+    80.54,
+    8.6
+   ],
+   "crop_counts": {
+    "Wheat": 0,
+    "Rice": 161,
+    "Mustard/Rapeseed (oilseed)": 1
+   }
+  }
+ ]
+}

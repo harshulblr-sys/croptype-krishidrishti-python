@@ -1,0 +1,511 @@
+<style>
+  .viz-root {
+    --page: #f9f9f7; --surface-1: #fcfcfb; --surface-2: #f4f3f0;
+    --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+    --grid: #e1e0d9; --axis: #c3c2b7; --border: rgba(11,11,11,0.10);
+    --lv-1: #b8b3ab;  /* out of season */
+    --lv0:  #0ca30c;  /* no stress  (good) */
+    --lv1:  #fab219;  /* watch      (warning) */
+    --lv2:  #ec835a;  /* advised    (serious) */
+    --lv3:  #d03b3b;  /* severe     (critical) */
+    --wheat:#2a78d6; --et0:#4a3aa7; --rain:#2a78d6;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    .viz-root {
+      --page:#0d0d0d; --surface-1:#1a1a19; --surface-2:#232320;
+      --ink:#fff; --ink-2:#c3c2b7; --muted:#898781;
+      --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,0.10);
+      --lv-1:#4a4945; --lv0:#0ca30c; --lv1:#fab219; --lv2:#ec835a; --lv3:#d03b3b;
+      --wheat:#3987e5; --et0:#9085e9; --rain:#3987e5;
+    }
+  }
+  :root[data-theme="dark"] .viz-root {
+    --page:#0d0d0d; --surface-1:#1a1a19; --surface-2:#232320;
+    --ink:#fff; --ink-2:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,0.10);
+    --lv-1:#4a4945; --wheat:#3987e5; --et0:#9085e9; --rain:#3987e5;
+  }
+  :root[data-theme="light"] .viz-root {
+    --page:#f9f9f7; --surface-1:#fcfcfb; --surface-2:#f4f3f0;
+    --ink:#0b0b0b; --ink-2:#52514e; --grid:#e1e0d9; --axis:#c3c2b7;
+    --border:rgba(11,11,11,0.10); --lv-1:#b8b3ab; --wheat:#2a78d6;
+    --et0:#4a3aa7; --rain:#2a78d6;
+  }
+  .viz-root {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--page); color: var(--ink);
+    max-width: 1180px; margin: 0 auto; padding: 24px 20px 64px;
+    line-height: 1.45;
+  }
+  .viz-root h1 { font-size: 25px; margin: 0 0 2px; letter-spacing: -0.01em; }
+  .viz-root .sub { color: var(--ink-2); font-size: 14px; margin-bottom: 20px; }
+  .viz-root h2 { font-size: 15px; margin: 0 0 12px; letter-spacing: -0.005em; }
+  .card {
+    background: var(--surface-1); border: 1px solid var(--border);
+    border-radius: 12px; padding: 18px 18px 14px; margin-bottom: 18px;
+  }
+  .kpis { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 18px; }
+  .kpi { background: var(--surface-1); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 16px; }
+  .kpi .v { font-size: 27px; font-weight: 650; letter-spacing: -0.02em; }
+  .kpi .l { font-size: 12.5px; color: var(--ink-2); margin-top: 2px; }
+  .kpi .l b { color: var(--ink); font-weight: 600; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 860px) { .grid2 { grid-template-columns: 1fr; }
+    .kpis { grid-template-columns: repeat(2,1fr); } }
+  .legend { display: flex; flex-wrap: wrap; gap: 12px 16px; font-size: 12.5px;
+    color: var(--ink-2); margin-top: 4px; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block;
+    box-shadow: 0 0 0 1px var(--border); }
+  .controls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    margin-bottom: 12px; }
+  .controls label { font-size: 13px; color: var(--ink-2); }
+  .dekbtns { display: flex; flex-wrap: wrap; gap: 4px; }
+  .dekbtns button { font: inherit; font-size: 11px; padding: 3px 7px; cursor: pointer;
+    border: 1px solid var(--border); background: var(--surface-2); color: var(--ink-2);
+    border-radius: 6px; }
+  .dekbtns button.on { background: var(--wheat); color: #fff; border-color: transparent; }
+  select { font: inherit; font-size: 13px; padding: 5px 8px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--surface-2); color: var(--ink); }
+  svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .ax { stroke: var(--axis); stroke-width: 1; }
+  .gl { stroke: var(--grid); stroke-width: 1; }
+  .tick { fill: var(--muted); font-size: 10.5px; }
+  .albl { fill: var(--ink-2); font-size: 11px; }
+  .tip { position: fixed; pointer-events: none; z-index: 20; background: var(--surface-1);
+    border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px; font-size: 12px;
+    color: var(--ink); box-shadow: 0 4px 16px rgba(0,0,0,0.18); opacity: 0; transition: opacity .08s; }
+  .tip b { font-weight: 600; }
+  .note { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  .pill { display:inline-block; font-size:11px; padding:1px 7px; border-radius:20px;
+    background: var(--surface-2); color: var(--ink-2); border:1px solid var(--border); }
+  table.dt { border-collapse: collapse; width: 100%; font-size: 12px; margin-top: 6px; }
+  table.dt th, table.dt td { text-align: right; padding: 3px 8px; border-bottom: 1px solid var(--grid); }
+  table.dt th:first-child, table.dt td:first-child { text-align: left; }
+  table.dt th { color: var(--muted); font-weight: 500; }
+  .fieldhdr { display:flex; gap:10px; align-items:baseline; flex-wrap:wrap; margin-bottom:10px; }
+  .fieldhdr .cn { font-size:16px; font-weight:600; }
+</style>
+
+<div class="viz-root" id="app">
+  <h1>Moisture-Stress &amp; Irrigation Advisory</h1>
+  <div class="sub" id="sub"></div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="card">
+    <h2>Regional advisory over the season</h2>
+    <div id="timeline"></div>
+    <div class="legend" id="tl-legend"></div>
+    <div class="note">Stacked count of fields at each advisory level, by 10-day dekad. Click a dekad to drive the map below.</div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h2>Water demand vs. supply <span class="pill">FAO-56, cell <span id="wcell"></span></span></h2>
+      <div id="weather"></div>
+      <div class="legend">
+        <span><span class="sw" style="background:var(--et0)"></span>Crop ET (wheat)</span>
+        <span><span class="sw" style="background:var(--rain)"></span>Effective rainfall</span>
+      </div>
+      <div class="note">Reference ET&#8320; from NASA POWER daily met data &times; wheat crop coefficient. Where the demand curve outruns rainfall, the soil-water bucket depletes toward the irrigation trigger.</div>
+    </div>
+    <div class="card">
+      <h2>Share of season needing irrigation, by crop</h2>
+      <div id="crops"></div>
+      <div class="note">Fraction of each crop's fields ever reaching &ldquo;Irrigation advised&rdquo; (orange) or &ldquo;Severe&rdquo; (red) during the rabi season.</div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h2>8-day crop water deficit <span class="pill">ETc &minus; ETa, rainfed FAO-56</span></h2>
+      <div id="deficit8"></div>
+      <div class="note" id="deficit-note"></div>
+    </div>
+    <div class="card">
+      <h2>Sowing dates from NDVI green-up <span class="pill">per-field phenology</span></h2>
+      <div id="sowing"></div>
+      <div class="legend" id="sow-legend"></div>
+      <div class="note" id="sow-note"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Field advisory map</h2>
+    <div class="controls">
+      <label>Dekad:</label>
+      <div class="dekbtns" id="dekbtns"></div>
+    </div>
+    <div id="map"></div>
+    <div class="legend" id="map-legend"></div>
+    <div class="note">Each dot is a 256&times;256 chip (~2.5&nbsp;km), colored by its worst in-season field advisory for the selected dekad. Hover for detail.</div>
+  </div>
+
+  <div class="card">
+    <h2>Field drill-down</h2>
+    <div class="controls">
+      <label for="fsel">Field:</label>
+      <select id="fsel"></select>
+    </div>
+    <div class="fieldhdr" id="fhdr"></div>
+    <div class="grid2">
+      <div><div id="f-veg"></div>
+        <div class="legend">
+          <span><span class="sw" style="background:var(--wheat)"></span>NDVI (greenness)</span>
+          <span><span class="sw" style="background:var(--et0)"></span>NDMI (canopy water)</span>
+        </div></div>
+      <div><div id="f-stress"></div>
+        <div class="legend">
+          <span><span class="sw" style="background:var(--rain)"></span>VCI (vs. same-crop peers)</span>
+          <span><span class="sw" style="background:var(--lv2)"></span>Soil-moisture proxy (S1)</span>
+        </div></div>
+    </div>
+    <div class="grid2" style="margin-top:14px">
+      <div><div id="f-ks"></div>
+        <div class="legend">
+          <span><span class="sw" style="background:var(--et0)"></span>Ks &mdash; FAO-56 water balance</span>
+          <span><span class="sw" style="background:var(--lv3)"></span>Ks &mdash; LSTM (satellite-only)</span>
+        </div></div>
+      <div><div id="f-deficit"></div>
+        <div class="legend">
+          <span><span class="sw" style="background:var(--lv2)"></span>Water deficit (mm / 8 days)</span>
+        </div></div>
+    </div>
+    <div id="f-strip" style="margin-top:12px"></div>
+    <div class="note">Advisory ribbon shows the fused level per dekad. VCI is a single-season percentile against same-crop neighbours (no multi-year climatology available); soil-moisture proxy is Sentinel-1 VV scaled between the field's seasonal dry and wet references. The LSTM Ks is predicted from the spectral/SAR series alone &mdash; no weather inputs &mdash; so it can stand in for the water balance where meteorological data is missing.</div>
+  </div>
+
+  <div class="note" style="margin-top:6px">
+    Advisory fuses a stage-aware FAO-56 crop-water balance (weather-driven demand, effective rainfall, root-zone depletion vs. the crop's readily-available-water trigger) with observed spectral stress (NDVI anomaly, VCI, NDMI, Sentinel-1 soil moisture). Crop identity per field comes from the project's 8-class classifier; growth-stage timing is anchored on each field's own NDVI green-up sowing date. Advisory rules are transparent, not learned; the LSTM runs alongside as a satellite-only stress estimator for weather-sparse operation. All detection steps are causal (no future dekads used), so the pipeline can run mid-season.
+  </div>
+</div>
+
+<div class="tip" id="tip"></div>
+
+<script id="payload" type="application/json">__DATA__</script>
+<script>
+(function () {
+  const D = JSON.parse(document.getElementById("payload").textContent);
+  const $ = (s, r) => (r || document).querySelector(s);
+  const cs = getComputedStyle($("#app"));
+  const C = k => cs.getPropertyValue(k).trim();
+  const LV = ["--lv-1","--lv0","--lv1","--lv2","--lv3"]; // index by (level+1)
+  const lvColor = l => C(LV[l + 1]);
+  const NL = D.level_names, NDK = D.dekad_labels.length;
+  const tip = $("#tip");
+  const showTip = (html, e) => { tip.innerHTML = html; tip.style.opacity = 1;
+    tip.style.left = Math.min(e.clientX + 14, innerWidth - 190) + "px";
+    tip.style.top = (e.clientY + 14) + "px"; };
+  const hideTip = () => { tip.style.opacity = 0; };
+  const SVGNS = "http://www.w3.org/2000/svg";
+  const el = (n, a) => { const x = document.createElementNS(SVGNS, n);
+    for (const k in (a||{})) x.setAttribute(k, a[k]); return x; };
+  const svg = (w, h) => el("svg", { viewBox:`0 0 ${w} ${h}` });
+
+  $("#sub").textContent = `${D.region} · ${D.season}`;
+  $("#wcell").textContent = D.weather.cell.replace("_", ", ");
+
+  // ---------------- KPIs ----------------
+  const lastPeak = D.peak_dekad;
+  const advisedPeak = D.timeline[lastPeak]["2"] + D.timeline[lastPeak]["3"];
+  const everAdvised = (() => { // fraction of fields advised at some point, from crops
+    let n = 0, tot = 0; for (const c in D.crops) { n += D.crops[c].ever_advised * D.crops[c].n; tot += D.crops[c].n; }
+    return tot ? n / tot : 0; })();
+  const kpis = [
+    [D.n_fields.toLocaleString(), `classified fields over <b>${D.n_chips}</b> chips`],
+    [(everAdvised*100).toFixed(0) + "%", "of fields needed irrigation at some dekad"],
+    [D.dekad_labels[lastPeak], `peak stress &mdash; <b>${advisedPeak}</b> fields advised`],
+    [(D.sowing.detected_frac*100).toFixed(0) + "%", "of sowing dates observed from NDVI green-up"],
+    [(D.deficit.season_total_m3/1e6).toFixed(1) + " Mm³", `season water deficit over <b>${Math.round(D.deficit.cropped_area_ha).toLocaleString()}</b> ha cropped`],
+    ["R² " + D.lstm.test.r2.toFixed(2), `LSTM stress model vs FAO-56 Ks (held-out chips, MAE ${D.lstm.test.mae.toFixed(3)})`],
+  ];
+  $("#kpis").innerHTML = kpis.map(k =>
+    `<div class="kpi"><div class="v">${k[0]}</div><div class="l">${k[1]}</div></div>`).join("");
+
+  // ---------------- shared axis helpers ----------------
+  function frame(host, w, h, pad) {
+    const s = svg(w, h); host.innerHTML = ""; host.appendChild(s);
+    return { s, x0: pad.l, x1: w - pad.r, y0: h - pad.b, y1: pad.t,
+             W: w - pad.l - pad.r, H: h - pad.t - pad.b, w, h, pad };
+  }
+  const dekShort = i => { const p = D.dekad_labels[i].split(" "); return p[1]; };
+  const dekMonth = i => D.dekad_labels[i].slice(2,7);
+
+  // ---------------- timeline (stacked bars) ----------------
+  (function () {
+    const host = $("#timeline"), f = frame(host, 720, 240, {l:36,r:10,t:8,b:34});
+    const order = [0,1,2,3,-1]; // draw in-season first, out-of-season on top faint
+    const stackOrder = [-1,0,1,2,3];
+    const maxTot = D.n_fields;
+    const bw = f.W / NDK * 0.72, step = f.W / NDK;
+    // y grid
+    for (let g=0; g<=4; g++){ const yy=f.y0-(f.H*g/4);
+      f.s.appendChild(el("line",{x1:f.x0,x2:f.x1,y1:yy,y2:yy,class:"gl"}));
+      const t=el("text",{x:f.x0-6,y:yy+3,class:"tick","text-anchor":"end"});
+      t.textContent=Math.round(maxTot*g/4); f.s.appendChild(t); }
+    for (let i=0;i<NDK;i++){
+      const cx = f.x0 + step*i + step/2; let acc = 0;
+      for (const lv of stackOrder){
+        const v = D.timeline[i][String(lv)]||0; if(!v) continue;
+        const hh = f.H * v / maxTot;
+        const y = f.y0 - acc - hh;
+        const r = el("rect",{x:cx-bw/2, y, width:bw, height:Math.max(0,hh-0.6),
+          rx:2, fill:lvColor(lv), stroke:C("--surface-1"), "stroke-width":0.6});
+        r.style.cursor="pointer";
+        r.addEventListener("mousemove",e=>showTip(
+          `<b>${dekMonth(i)} ${dekShort(i)}</b><br>${NL[lv+1]}: <b>${v}</b> fields`,e));
+        r.addEventListener("mouseleave",hideTip);
+        r.addEventListener("click",()=>setDekad(i));
+        f.s.appendChild(r); acc += hh;
+      }
+      if(i%3===0){ const t=el("text",{x:cx,y:f.y0+14,class:"tick","text-anchor":"middle"});
+        t.textContent=dekMonth(i); f.s.appendChild(t);}
+    }
+    $("#tl-legend").innerHTML = [1,2,3,4,0].map(k=>{const lv=k===0?-1:k-1;
+      return `<span><span class="sw" style="background:${lvColor(lv)}"></span>${NL[lv+1]}</span>`;}).join("");
+  })();
+
+  // ---------------- weather: ET0 vs rain (grouped bars, one scale mm) ----------------
+  (function () {
+    const host=$("#weather"), f=frame(host,470,220,{l:34,r:8,t:8,b:30});
+    const et0=D.weather.et0, rain=D.weather.rain;
+    const mx=Math.max(...et0,...rain,1);
+    for(let g=0;g<=4;g++){const yy=f.y0-(f.H*g/4);
+      f.s.appendChild(el("line",{x1:f.x0,x2:f.x1,y1:yy,y2:yy,class:"gl"}));
+      const t=el("text",{x:f.x0-5,y:yy+3,class:"tick","text-anchor":"end"});
+      t.textContent=Math.round(mx*g/4);f.s.appendChild(t);}
+    const step=f.W/NDK, bw=step*0.34;
+    for(let i=0;i<NDK;i++){
+      const cx=f.x0+step*i+step/2;
+      const pairs=[[et0[i],C("--et0"),-bw/2-0.6,"Crop ET"],[rain[i],C("--rain"),bw/2+0.6,"Rainfall"]];
+      for(const [v,col,off,lab] of pairs){
+        const hh=f.H*v/mx;
+        const r=el("rect",{x:cx+off-bw/2,y:f.y0-hh,width:bw,height:Math.max(0,hh),rx:2,fill:col});
+        r.addEventListener("mousemove",e=>showTip(`<b>${dekMonth(i)} ${dekShort(i)}</b><br>${lab}: <b>${v} mm</b>`,e));
+        r.addEventListener("mouseleave",hideTip);
+        f.s.appendChild(r);
+      }
+      if(i%3===0){const t=el("text",{x:cx,y:f.y0+13,class:"tick","text-anchor":"middle"});
+        t.textContent=dekMonth(i);f.s.appendChild(t);}
+    }
+    const yl=el("text",{x:f.x0-26,y:f.y1-1,class:"albl","text-anchor":"start"});yl.textContent="mm / dekad";f.s.appendChild(yl);
+  })();
+
+  // ---------------- per-crop advised share (horizontal bars) ----------------
+  (function () {
+    const host=$("#crops");
+    const entries=Object.entries(D.crops).filter(([k])=>k!=="No crop/Fallow"&&k!=="Rice"&&k!=="Maize")
+      .sort((a,b)=>b[1].ever_advised-a[1].ever_advised);
+    const rows=entries.length, rh=26, f=frame(host,470, rows*rh+30, {l:76,r:34,t:6,b:20});
+    const step=f.H/rows;
+    for(let gx=0;gx<=4;gx++){const xx=f.x0+f.W*gx/4;
+      f.s.appendChild(el("line",{x1:xx,x2:xx,y1:f.y1,y2:f.y0,class:"gl"}));
+      const t=el("text",{x:xx,y:f.y0+14,class:"tick","text-anchor":"middle"});t.textContent=(gx*25)+"%";f.s.appendChild(t);}
+    entries.forEach(([name,c],i)=>{
+      const cy=f.y1+step*i+step/2;
+      const t=el("text",{x:f.x0-8,y:cy+4,class:"albl","text-anchor":"end"});t.textContent=name;f.s.appendChild(t);
+      const wSev=f.W*c.ever_severe, wAdv=f.W*c.ever_advised;
+      f.s.appendChild(el("rect",{x:f.x0,y:cy-7,width:Math.max(0,wAdv),height:14,rx:3,fill:C("--lv2")}));
+      f.s.appendChild(el("rect",{x:f.x0,y:cy-7,width:Math.max(0,wSev),height:14,rx:3,fill:C("--lv3")}));
+      const lab=el("text",{x:f.x0+Math.max(wAdv,2)+5,y:cy+4,class:"tick","text-anchor":"start"});
+      lab.textContent=(c.ever_advised*100).toFixed(0)+"%  (n="+c.n+")";f.s.appendChild(lab);
+      const hit=el("rect",{x:f.x0,y:cy-step/2,width:f.W,height:step,fill:"transparent"});
+      hit.addEventListener("mousemove",e=>showTip(`<b>${name}</b> &middot; ${c.n} fields<br>Ever advised: <b>${(c.ever_advised*100).toFixed(0)}%</b><br>Ever severe: <b>${(c.ever_severe*100).toFixed(0)}%</b>`,e));
+      hit.addEventListener("mouseleave",hideTip);f.s.appendChild(hit);
+    });
+  })();
+
+  // ---------------- 8-day deficit (regional bars) ----------------
+  (function () {
+    const host=$("#deficit8"), L=D.deficit.labels, N8=L.length;
+    const f=frame(host,470,220,{l:34,r:8,t:8,b:30});
+    const vals=D.deficit.mean_mm, mx=Math.max(...vals,1);
+    for(let g=0;g<=4;g++){const yy=f.y0-(f.H*g/4);
+      f.s.appendChild(el("line",{x1:f.x0,x2:f.x1,y1:yy,y2:yy,class:"gl"}));
+      const t=el("text",{x:f.x0-5,y:yy+3,class:"tick","text-anchor":"end"});
+      t.textContent=Math.round(mx*g/4);f.s.appendChild(t);}
+    const step=f.W/N8, bw=step*0.7;
+    for(let i=0;i<N8;i++){
+      const cx=f.x0+step*i+step/2, hh=f.H*vals[i]/mx;
+      const r=el("rect",{x:cx-bw/2,y:f.y0-hh,width:bw,height:Math.max(0,hh),rx:2,
+        fill:C(i===D.deficit.peak?"--lv3":"--lv2")});
+      r.addEventListener("mousemove",e=>showTip(
+        `<b>${L[i]}</b><br>Mean deficit: <b>${vals[i]} mm</b><br>`+
+        `Region total: <b>${(D.deficit.total_m3[i]/1e3).toFixed(0)}k m³</b>`,e));
+      r.addEventListener("mouseleave",hideTip);f.s.appendChild(r);
+      if(i%3===0){const t=el("text",{x:cx,y:f.y0+13,class:"tick","text-anchor":"middle"});
+        t.textContent=L[i];f.s.appendChild(t);}
+    }
+    const yl=el("text",{x:f.x0-26,y:f.y1-1,class:"albl","text-anchor":"start"});
+    yl.textContent="mm / 8 days";f.s.appendChild(yl);
+    $("#deficit-note").innerHTML=`Unmet crop water demand per 8-day period, averaged over cropped fields (each field's stage-aware FAO-56 rainfed bucket, anchored on its own green-up sowing date). Peak: <b>${L[D.deficit.peak]}</b> at <b>${vals[D.deficit.peak]} mm</b>. Season mean per field: <b>${D.deficit.season_mean_mm} mm</b>; scheduled-irrigation requirement: <b>${(D.deficit.season_irrig_m3/1e6).toFixed(1)} Mm³</b>.`;
+  })();
+
+  // ---------------- sowing histogram (stacked by crop) ----------------
+  (function () {
+    const host=$("#sowing"), bins=D.sowing.bins, NB=bins.length;
+    const crops=Object.keys(D.sowing.per_crop);
+    const cols={"Wheat":C("--wheat"),"Mustard":C("--lv1"),"Lentil":C("--et0"),
+                "Sugarcane":C("--lv2"),"Other":C("--muted")};
+    const col=c=>cols[c]||C("--lv-1");
+    const totals=bins.map((_,i)=>crops.reduce((a,c)=>a+D.sowing.per_crop[c].hist[i],0));
+    const mx=Math.max(...totals,1);
+    const f=frame(host,470,220,{l:34,r:8,t:8,b:30});
+    for(let g=0;g<=4;g++){const yy=f.y0-(f.H*g/4);
+      f.s.appendChild(el("line",{x1:f.x0,x2:f.x1,y1:yy,y2:yy,class:"gl"}));
+      const t=el("text",{x:f.x0-5,y:yy+3,class:"tick","text-anchor":"end"});
+      t.textContent=Math.round(mx*g/4);f.s.appendChild(t);}
+    const step=f.W/NB, bw=step*0.7;
+    const binLab=b=>{const d=+b.slice(8,10);
+      const mo=new Date(b+"T00:00").toLocaleString("en",{month:"short"});
+      return mo+" d"+(d<11?1:d<21?2:3);};
+    for(let i=0;i<NB;i++){
+      const cx=f.x0+step*i+step/2; let acc=0;
+      for(const c of crops){
+        const v=D.sowing.per_crop[c].hist[i]; if(!v) continue;
+        const hh=f.H*v/mx;
+        const r=el("rect",{x:cx-bw/2,y:f.y0-acc-hh,width:bw,height:Math.max(0,hh-0.5),
+          rx:1.5,fill:col(c)});
+        r.addEventListener("mousemove",e=>showTip(
+          `<b>${binLab(bins[i])}</b><br>${c}: <b>${v}</b> fields sown`,e));
+        r.addEventListener("mouseleave",hideTip);f.s.appendChild(r);acc+=hh;
+      }
+      if(i%2===0){const t=el("text",{x:cx,y:f.y0+13,class:"tick","text-anchor":"middle"});
+        t.textContent=binLab(bins[i]);f.s.appendChild(t);}
+    }
+    $("#sow-legend").innerHTML=crops.map(c=>
+      `<span><span class="sw" style="background:${col(c)}"></span>${c}</span>`).join("");
+    const wm=D.sowing.per_crop["Wheat"];
+    $("#sow-note").innerHTML=`Sowing date = NDVI green-up crossing (0.30, kharif-trough aware) minus a crop emergence lag &mdash; observed per field, replacing the fixed calendar.`+
+      (wm?` Wheat median <b>${wm.median}</b> vs calendar default ${wm.calendar}; spread of several weeks drives large differences in irrigation need.`:"");
+  })();
+
+  // ---------------- map ----------------
+  let curDek = D.peak_dekad;
+  const chips = Object.entries(D.chips);
+  const lons=chips.map(c=>c[1].lon), lats=chips.map(c=>c[1].lat);
+  const mnx=Math.min(...lons),mxx=Math.max(...lons),mny=Math.min(...lats),mxy=Math.max(...lats);
+  const mapHost=$("#map");
+  function drawMap(){
+    const w=720,h=380,pad={l:34,r:10,t:8,b:28};
+    const f=frame(mapHost,w,h,pad);
+    const sx=v=>f.x0+(v-mnx)/(mxx-mnx)*f.W, sy=v=>f.y0-(v-mny)/(mxy-mny)*f.H;
+    // lat/lon ticks
+    for(let g=0;g<=4;g++){const xx=f.x0+f.W*g/4, lonv=mnx+(mxx-mnx)*g/4;
+      const t=el("text",{x:xx,y:f.y0+14,class:"tick","text-anchor":"middle"});t.textContent=lonv.toFixed(1)+"°E";f.s.appendChild(t);
+      const yy=f.y1+f.H*g/4, latv=mxy-(mxy-mny)*g/4;
+      const t2=el("text",{x:f.x0-6,y:yy+3,class:"tick","text-anchor":"end"});t2.textContent=latv.toFixed(1)+"°N";f.s.appendChild(t2);}
+    for(const [id,c] of chips){
+      const lv=c.worst[curDek];
+      const dot=el("circle",{cx:sx(c.lon),cy:sy(c.lat),r:4.4,fill:lvColor(lv),
+        stroke:C("--surface-1"),"stroke-width":0.5});
+      dot.style.cursor="pointer";
+      dot.addEventListener("mousemove",e=>showTip(
+        `<b>${id}</b> &middot; ${c.n} fields<br>${dekMonth(curDek)} ${dekShort(curDek)}: <b>${NL[lv+1]}</b>`,e));
+      dot.addEventListener("mouseleave",hideTip);
+      f.s.appendChild(dot);
+    }
+  }
+  $("#map-legend").innerHTML=[-1,0,1,2,3].map(lv=>
+    `<span><span class="sw" style="background:${lvColor(lv)}"></span>${NL[lv+1]}</span>`).join("");
+  // dekad buttons
+  const db=$("#dekbtns");
+  for(let i=0;i<NDK;i++){const b=document.createElement("button");
+    b.textContent=dekMonth(i)+" "+dekShort(i);b.dataset.i=i;
+    b.addEventListener("click",()=>setDekad(i));db.appendChild(b);}
+  function setDekad(i){curDek=i;
+    [...db.children].forEach(b=>b.classList.toggle("on",+b.dataset.i===i));
+    drawMap();}
+  setDekad(curDek);
+
+  // ---------------- field drill-down ----------------
+  const fsel=$("#fsel");
+  D.fields.forEach((fd,i)=>{const o=document.createElement("option");
+    o.value=i;o.textContent=`${fd.crop} — ${fd.tag} (${fd.id})`;fsel.appendChild(o);});
+  function lineChart(host,series,dom,ylab){
+    // series: [{data:[..],color,label,axis:0|1}] over NDK dekads; dom=[min,max] for axis0
+    const f=frame(host,470,210,{l:36,r:34,t:10,b:26});
+    const sx=i=>f.x0+ (NDK>1? i/(NDK-1)*f.W : 0);
+    for(let g=0;g<=4;g++){const yy=f.y0-f.H*g/4;
+      f.s.appendChild(el("line",{x1:f.x0,x2:f.x1,y1:yy,y2:yy,class:"gl"}));
+      const t=el("text",{x:f.x0-6,y:yy+3,class:"tick","text-anchor":"end"});
+      t.textContent=(dom[0]+(dom[1]-dom[0])*g/4).toFixed(2);f.s.appendChild(t);}
+    for(let i=0;i<NDK;i+=3){const t=el("text",{x:sx(i),y:f.y0+14,class:"tick","text-anchor":"middle"});
+      t.textContent=dekMonth(i);f.s.appendChild(t);}
+    for(const s of series){
+      const sy = s.axis===1
+        ? (v=> f.y0 - (v-s.dom[0])/(s.dom[1]-s.dom[0])*f.H)
+        : (v=> f.y0 - (v-dom[0])/(dom[1]-dom[0])*f.H);
+      let dpath="",started=false;
+      s.data.forEach((v,i)=>{ if(v==null){started=false;return;}
+        dpath += (started?"L":"M")+sx(i).toFixed(1)+" "+sy(v).toFixed(1)+" ";started=true;});
+      f.s.appendChild(el("path",{d:dpath,fill:"none",stroke:s.color,"stroke-width":2,
+        "stroke-linejoin":"round","stroke-linecap":"round",
+        "stroke-dasharray": s.axis===1? "4 3":""}));
+      s.data.forEach((v,i)=>{ if(v==null)return;
+        const c=el("circle",{cx:sx(i),cy:sy(v),r:3,fill:s.color,stroke:C("--surface-1"),"stroke-width":1});
+        c.addEventListener("mousemove",e=>showTip(`<b>${dekMonth(i)} ${dekShort(i)}</b><br>${s.label}: <b>${v}</b>`,e));
+        c.addEventListener("mouseleave",hideTip);f.s.appendChild(c);});
+    }
+    if(series[1] && series[1].axis===1){ // right axis ticks
+      for(let g=0;g<=4;g++){const yy=f.y0-f.H*g/4;
+        const t=el("text",{x:f.x1+6,y:yy+3,class:"tick","text-anchor":"start"});
+        t.textContent=(series[1].dom[0]+(series[1].dom[1]-series[1].dom[0])*g/4).toFixed(0);f.s.appendChild(t);}
+    }
+  }
+  function strip(host,levels){
+    const f=frame(host,720,54,{l:0,r:0,t:4,b:20}); const step=f.w/NDK;
+    for(let i=0;i<NDK;i++){
+      const r=el("rect",{x:step*i+0.6,y:6,width:step-1.2,height:26,rx:2,fill:lvColor(levels[i])});
+      r.addEventListener("mousemove",e=>showTip(`<b>${dekMonth(i)} ${dekShort(i)}</b><br>${NL[levels[i]+1]}`,e));
+      r.addEventListener("mouseleave",hideTip);f.s.appendChild(r);
+      if(i%3===0){const t=el("text",{x:step*i+step/2,y:46,class:"tick","text-anchor":"middle"});
+        t.textContent=dekMonth(i);f.s.appendChild(t);}
+    }
+  }
+  function deficitBars(host,vals){
+    const L=D.deficit.labels, N8=L.length;
+    const f=frame(host,470,210,{l:34,r:8,t:10,b:26});
+    const mx=Math.max(...vals,5);
+    for(let g=0;g<=4;g++){const yy=f.y0-f.H*g/4;
+      f.s.appendChild(el("line",{x1:f.x0,x2:f.x1,y1:yy,y2:yy,class:"gl"}));
+      const t=el("text",{x:f.x0-5,y:yy+3,class:"tick","text-anchor":"end"});
+      t.textContent=Math.round(mx*g/4);f.s.appendChild(t);}
+    const step=f.W/N8, bw=step*0.7;
+    for(let i=0;i<N8;i++){
+      const cx=f.x0+step*i+step/2, hh=f.H*vals[i]/mx;
+      const r=el("rect",{x:cx-bw/2,y:f.y0-hh,width:bw,height:Math.max(0,hh),rx:2,fill:C("--lv2")});
+      r.addEventListener("mousemove",e=>showTip(`<b>${L[i]}</b><br>Deficit: <b>${vals[i]} mm</b>`,e));
+      r.addEventListener("mouseleave",hideTip);f.s.appendChild(r);
+      if(i%3===0){const t=el("text",{x:cx,y:f.y0+13,class:"tick","text-anchor":"middle"});
+        t.textContent=L[i];f.s.appendChild(t);}
+    }
+  }
+  const SOWM=["green-up","green-up (early)","crop median","calendar","perennial"];
+  function showField(idx){
+    const fd=D.fields[idx];
+    $("#fhdr").innerHTML=`<span class="cn">${fd.crop}</span>
+      <span class="pill">${fd.id}</span>
+      <span class="pill">${fd.npx} px</span>
+      <span class="pill">weather cell ${fd.cell.replace("_",", ")}</span>
+      ${fd.sow?`<span class="pill">sown ${fd.sow} (${SOWM[fd.sow_method]})</span>`:""}
+      <span class="pill" style="background:${lvColor(Math.max(...fd.level))};color:#fff;border:none">worst: ${NL[Math.max(...fd.level)+1]}</span>`;
+    lineChart($("#f-veg"),[
+      {data:fd.ndvi,color:C("--wheat"),label:"NDVI",axis:0},
+      {data:fd.ndmi,color:C("--et0"),label:"NDMI",axis:0}],[-0.1,0.9]);
+    lineChart($("#f-stress"),[
+      {data:fd.vci,color:C("--rain"),label:"VCI %",axis:1,dom:[0,100]},
+      {data:fd.ssm.map(v=>v==null?null:v),color:C("--lv2"),label:"SSM",axis:0}],[0,1]);
+    lineChart($("#f-ks"),[
+      {data:fd.ks_fao,color:C("--et0"),label:"Ks (FAO-56)",axis:0},
+      {data:fd.ks_lstm,color:C("--lv3"),label:"Ks (LSTM)",axis:0}],[0,1.05]);
+    deficitBars($("#f-deficit"),fd.deficit8);
+    strip($("#f-strip"),fd.level);
+  }
+  fsel.addEventListener("change",()=>showField(+fsel.value));
+  showField(0);
+})();
+</script>
