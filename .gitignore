@@ -26,3 +26,8 @@ frontend/dist/
 # docs assets are tracked even where the patterns above would exclude them
 !docs/*.pdf
 !docs/images/*.png
+
+# GEE service-account keys — NEVER commit credentials
+*service*account*.json
+*-key.json
+gee_key.json
