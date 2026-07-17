@@ -27,6 +27,9 @@ frontend/dist/
 !docs/*.pdf
 !docs/images/*.png
 
+# machine-local editor/agent config
+.claude/
+
 # GEE service-account keys — NEVER commit credentials
 *service*account*.json
 *-key.json

@@ -50,23 +50,34 @@ For frontend development with hot reload: `cd frontend && npm run dev` (Vite on 
 ## Repository layout
 
 ```
-├── README.md / PROJECT_REPORT.md / handoff.md   docs
-├── docs/                       report PDF + images
+├── README.md / PROJECT_REPORT.md / handoff.md   docs & development log
+├── docs/                       report PDF, figures, problem statement
+├── deploy/                     systemd unit · Caddyfile · hosting guide
+├── Dockerfile                  container build (VM / Hugging Face Spaces)
 ├── frontend/                   React + MapLibre draw-AOI web UI
+│
+│   — web service —
 ├── aoi_server.py               FastAPI service (jobs API + static frontend)
 ├── aoi_run.py                  orchestrator: bbox → full pipeline
 ├── aoi_prepare.py / aoi_classify.py             AOI fetch + classification
+├── gee_auth.py                 EE auth (service account / personal login)
 ├── gee_export_s2.py            GEE compositing recipes (shared train/serve)
+├── spike_gee_fetch.py          GEE latency benchmark
+│
+│   — model training —
 ├── rebuild_metadata.py / make_splits.py / build_features.py
-│                               training-data pipeline
 ├── train_field_tempcnn.py / finalize_classifier.py
-│                               model training
+│
+│   — stress → advisory → dashboard —
 ├── stress_common.py            season/crop constants (env-parameterized)
 ├── weather_et0.py / stress_indices.py / sowing_detect.py
 ├── water_balance.py / advisory.py / stress_lstm.py
 ├── advisory_maps.py / deficit_maps.py / dashboard_data.py
-│                               stress → advisory → maps → dashboard
-└── dashboard_template.html     self-contained dashboard shell
+├── dashboard_template.html     self-contained dashboard shell
+│
+├── data_prep/                  one-time training-dataset construction
+└── experiments/                research studies & negative results
+                                (the evidence behind the honest 0.73 CV)
 ```
 
 ## License & data
