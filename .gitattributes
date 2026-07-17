@@ -1,0 +1,10 @@
+# Never let line-ending normalization touch binaries
+*.pdf  binary
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.docx binary
+*.tif  binary
+*.npz  binary
+# Windows launchers keep CRLF
+*.cmd  text eol=crlf
