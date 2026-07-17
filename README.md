@@ -23,29 +23,40 @@ A full-stack AI + remote-sensing system built for ISRO Problem Statement 6 (AI-d
 
 📄 **Full write-up:** [PROJECT_REPORT.md](PROJECT_REPORT.md) · [PDF](docs/KrishiDrishti_Technical_Report.pdf)
 
-## Quick start
+## Run it yourself (on your own machine)
 
+Anyone can run the full web app locally — you don't need the training data,
+just the code, the trained models, and your own (free) Earth Engine access.
+
+**Prerequisites**
+1. **Python 3.10+** and **Node 18+**.
+2. **The trained models** — download `models.zip` from this repo's
+   [Releases](../../releases) and unzip it into the project root so you have
+   `runs/final_classifier_rebuilt/`, `runs/tempcnn_rebuilt/`,
+   `runs/stress_lstm/` (these are ~11 MB, not stored in git).
+3. **Your own Earth Engine account** (free for non-commercial use):
+   sign up at [earthengine.google.com](https://earthengine.google.com), which
+   gives you a Google Cloud project id.
+
+**Setup**
 ```bash
-# 1. Python deps (3.10+)
 pip install -r requirements.txt
+earthengine authenticate                     # one-time browser login
+export GEE_PROJECT=your-cloud-project-id     # Windows: set GEE_PROJECT=...
 
-# 2. Earth Engine auth (one-time)
-earthengine authenticate
-
-# 3. Frontend (one-time build; Node 18+)
 cd frontend && npm install && npm run build && cd ..
-
-# 4. Run — one server does everything
-python aoi_server.py            # → http://127.0.0.1:8000
+python aoi_server.py                          # → http://127.0.0.1:8000
 ```
 
-On Windows, `start_servers.cmd` does step 4 in its own terminal window.
-For frontend development with hot reload: `cd frontend && npm run dev` (Vite on :5173, proxies `/api` to :8000).
+On Windows, `start_servers.cmd` runs the server in its own window.
+For frontend development with hot reload: `cd frontend && npm run dev`
+(Vite on :5173, proxies `/api` to :8000).
 
-> **Note:** training data (AgriFieldNet chips), satellite tiles and trained model
-> artifacts (`runs/`) are not in this repo — see
-> [handoff.md](handoff.md) for the full pipeline documentation and
-> `rebuild_metadata.py` → `finalize_classifier.py` for reproducing the models.
+> **Reproducing the models / dataset** (not needed just to run the app):
+> the AgriFieldNet chips and satellite tiles aren't in this repo — see
+> [handoff.md](handoff.md) and run `rebuild_metadata.py` →
+> `finalize_classifier.py`. Deployment guides (VM, Cloudflare Tunnel) are
+> in [deploy/](deploy/).
 
 ## Repository layout
 
