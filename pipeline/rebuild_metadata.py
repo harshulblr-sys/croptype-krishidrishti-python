@@ -11,7 +11,7 @@ from collections import Counter, defaultdict
 
 import numpy as np
 
-ROOT = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # repo root (script now in pipeline/)
 DATA_DIR = os.environ.get("AGRI_DATA_DIR", os.path.join(ROOT, "Extracted_dataset_gee"))
 CHIP_DIR = os.path.join(DATA_DIR, "chips")
 

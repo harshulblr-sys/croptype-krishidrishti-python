@@ -20,7 +20,8 @@ import os
 
 import numpy as np
 
-ROOT = os.path.dirname(os.path.abspath(__file__))
+PKG_DIR = os.path.dirname(os.path.abspath(__file__))         # pipeline/
+ROOT = os.path.dirname(PKG_DIR)                              # repo root
 DATA_DIR = os.environ.get("AGRI_DATA_DIR", os.path.join(ROOT, "Extracted_dataset_gee"))
 CHIP_DIR = os.path.join(DATA_DIR, "chips")
 SAT_DIR = os.path.join(ROOT, "Satellite_data")

@@ -16,7 +16,7 @@ import numpy as np
 from lightgbm import LGBMClassifier
 from sklearn.metrics import cohen_kappa_score, confusion_matrix, precision_recall_fscore_support
 
-ROOT = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # repo root (script now in pipeline/)
 DATA_DIR = os.environ.get("AGRI_DATA_DIR", os.path.join(ROOT, "Extracted_dataset_gee"))
 OUT_DIR = os.path.join(ROOT, "runs", "final_classifier_rebuilt")
 

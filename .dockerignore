@@ -4,7 +4,8 @@
 
 !requirements.txt
 !*.py
-!dashboard_template.html
+!pipeline/
+!pipeline/**
 
 !frontend/
 frontend/node_modules/

@@ -14,7 +14,7 @@ import os
 # account must point at THEIR project via the GEE_PROJECT env var (they have
 # no access to the original one).
 PROJECT = os.environ.get("GEE_PROJECT", "crop-identification-501611")
-ROOT = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # repo root (script now in pipeline/)
 KEY_FILE = os.environ.get("GEE_KEY_FILE", os.path.join(ROOT, "gee_key.json"))
 
 

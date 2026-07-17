@@ -1,5 +1,9 @@
 # Crop Classification + Moisture Stress Pipeline — Handoff
 
+> **2026-07-18 repo layout:** all pipeline/model scripts named below now live
+> in `pipeline/` (entry points `aoi_run.py` / `aoi_server.py` stay at root).
+> Paths in this historical log are relative to `pipeline/` unless noted.
+
 > Rebuilt 2026-07-13 after the original scripts/handoff were lost (probable
 > OneDrive sync event — only datasets and `runs/` artifacts survived). The
 > classifier is rebuilt and validated at parity (§4). 2026-07-14: data-source

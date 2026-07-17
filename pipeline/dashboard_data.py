@@ -228,7 +228,7 @@ def main():
           f"{len(fields)} drill-down fields, {len(chips_u)} chips")
 
     # assemble the self-contained dashboard: template + inline JSON
-    with open(os.path.join(sc.ROOT, "dashboard_template.html"), encoding="utf-8") as f:
+    with open(os.path.join(sc.PKG_DIR, "dashboard_template.html"), encoding="utf-8") as f:
         tpl = f.read()
     html = tpl.replace("__DATA__", json.dumps(payload, separators=(",", ":"))
                        .replace("</", "<\\/"))

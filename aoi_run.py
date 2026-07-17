@@ -30,6 +30,7 @@ import sys
 import time
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
+PIPE = os.path.join(ROOT, "pipeline")            # stage scripts live here
 # Gate: Indo-Gangetic plain + the four pilot regions (W, S, E, N). South of
 # ~19N the model has zero training support (different crops/calendars).
 SUPPORTED = (68.0, 19.0, 89.0, 32.5)
@@ -90,29 +91,29 @@ def main():
         return all(os.path.exists(os.path.join(ws, p)) for p in paths)
 
     stages = [
-        ("prepare", [sys.executable, "aoi_prepare.py", "--bbox", str(w), str(s),
+        ("prepare", [sys.executable, os.path.join(PIPE, "aoi_prepare.py"), "--bbox", str(w), str(s),
                      str(e), str(n), "--year", str(args.year), "--workspace", ws,
                      "--workers", str(args.workers)],
          lambda: done("aoi_meta.json")),
-        ("classify", [sys.executable, "aoi_classify.py"],
+        ("classify", [sys.executable, os.path.join(PIPE, "aoi_classify.py")],
          lambda: done("moisture_stress/crop_map.npz")),
-        ("weather", [sys.executable, "weather_et0.py"],
+        ("weather", [sys.executable, os.path.join(PIPE, "weather_et0.py")],
          lambda: done("moisture_stress/weather_daily.csv")),
-        ("indices", [sys.executable, "stress_indices.py"],
+        ("indices", [sys.executable, os.path.join(PIPE, "stress_indices.py")],
          lambda: done("moisture_stress/field_timeseries.npz")),
-        ("sowing", [sys.executable, "sowing_detect.py"],
+        ("sowing", [sys.executable, os.path.join(PIPE, "sowing_detect.py")],
          lambda: done("moisture_stress/sowing.npz")),
-        ("water_balance", [sys.executable, "water_balance.py"],
+        ("water_balance", [sys.executable, os.path.join(PIPE, "water_balance.py")],
          lambda: done("moisture_stress/water_balance.json")),
-        ("advisory", [sys.executable, "advisory.py"],
+        ("advisory", [sys.executable, os.path.join(PIPE, "advisory.py")],
          lambda: done("moisture_stress/advisory.npz")),
-        ("lstm", [sys.executable, "stress_lstm.py", "--infer"],
+        ("lstm", [sys.executable, os.path.join(PIPE, "stress_lstm.py"), "--infer"],
          lambda: done("moisture_stress/lstm_ks.npz")),
-        ("advisory_maps", [sys.executable, "advisory_maps.py"],
+        ("advisory_maps", [sys.executable, os.path.join(PIPE, "advisory_maps.py")],
          lambda: done("moisture_stress/maps/region_grid.png")),
-        ("deficit_maps", [sys.executable, "deficit_maps.py"],
+        ("deficit_maps", [sys.executable, os.path.join(PIPE, "deficit_maps.py")],
          lambda: done("moisture_stress/maps/deficit_grid.png")),
-        ("dashboard", [sys.executable, "dashboard_data.py"],
+        ("dashboard", [sys.executable, os.path.join(PIPE, "dashboard_data.py")],
          lambda: done("moisture_stress/dashboard.html")),
     ]
 

@@ -34,7 +34,8 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu \
     && pip install --no-cache-dir -r requirements.txt
 
-COPY *.py dashboard_template.html ./
+COPY aoi_run.py aoi_server.py ./
+COPY pipeline/ pipeline/
 COPY runs/ runs/
 COPY --from=webbuild /web/dist frontend/dist
 

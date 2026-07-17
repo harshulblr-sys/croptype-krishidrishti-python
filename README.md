@@ -54,8 +54,8 @@ For frontend development with hot reload: `cd frontend && npm run dev`
 
 > **Reproducing the models / dataset** (not needed just to run the app):
 > the AgriFieldNet chips and satellite tiles aren't in this repo — see
-> [handoff.md](handoff.md) and run `rebuild_metadata.py` →
-> `finalize_classifier.py`. Deployment guides (VM, Cloudflare Tunnel) are
+> [handoff.md](handoff.md) and run `pipeline/rebuild_metadata.py` →
+> `pipeline/finalize_classifier.py`. Deployment guides (VM, Cloudflare Tunnel) are
 > in [deploy/](deploy/).
 
 ## Repository layout
@@ -63,28 +63,24 @@ For frontend development with hot reload: `cd frontend && npm run dev`
 ```
 ├── README.md / PROJECT_REPORT.md / handoff.md   docs & development log
 ├── docs/                       report PDF, figures, problem statement
-├── deploy/                     systemd unit · Caddyfile · hosting guide
+├── deploy/                     systemd unit · Caddyfile · hosting guides
 ├── Dockerfile                  container build (VM / Hugging Face Spaces)
 ├── frontend/                   React + MapLibre draw-AOI web UI
 │
-│   — web service —
+│   — entry points (root) —
 ├── aoi_server.py               FastAPI service (jobs API + static frontend)
-├── aoi_run.py                  orchestrator: bbox → full pipeline
-├── aoi_prepare.py / aoi_classify.py             AOI fetch + classification
-├── gee_auth.py                 EE auth (service account / personal login)
-├── gee_export_s2.py            GEE compositing recipes (shared train/serve)
-├── spike_gee_fetch.py          GEE latency benchmark
+├── aoi_run.py                  orchestrator: bbox → full 11-stage pipeline
 │
-│   — model training —
-├── rebuild_metadata.py / make_splits.py / build_features.py
-├── train_field_tempcnn.py / finalize_classifier.py
-│
-│   — stress → advisory → dashboard —
-├── stress_common.py            season/crop constants (env-parameterized)
-├── weather_et0.py / stress_indices.py / sowing_detect.py
-├── water_balance.py / advisory.py / stress_lstm.py
-├── advisory_maps.py / deficit_maps.py / dashboard_data.py
-├── dashboard_template.html     self-contained dashboard shell
+├── pipeline/                   all pipeline & model code
+│   ├── aoi_prepare.py / aoi_classify.py         AOI fetch + classification
+│   ├── gee_auth.py / gee_export_s2.py           Earth Engine auth + composites
+│   ├── stress_common.py                         season/crop constants (env-driven)
+│   ├── weather_et0.py / stress_indices.py / sowing_detect.py
+│   ├── water_balance.py / advisory.py / stress_lstm.py
+│   ├── advisory_maps.py / deficit_maps.py / dashboard_data.py
+│   ├── dashboard_template.html                  self-contained dashboard shell
+│   └── rebuild_metadata.py / make_splits.py / build_features.py
+│       train_field_tempcnn.py / finalize_classifier.py   (model training)
 │
 ├── data_prep/                  one-time training-dataset construction
 └── experiments/                research studies & negative results
