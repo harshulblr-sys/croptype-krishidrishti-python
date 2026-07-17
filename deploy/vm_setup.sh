@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# One-shot setup for an Oracle Cloud Always Free VM (Ubuntu 22.04, ARM Ampere).
+# One-shot setup for an Ubuntu VM — DigitalOcean, Google Cloud, Oracle, etc.
+# (x86 or ARM; installs the right wheels either way.)
 #
 # Prerequisites, already done before you run this:
 #   1. The repo is cloned into the CURRENT directory (git clone ...).
@@ -8,10 +9,11 @@
 #        - runs/final_classifier_rebuilt/    (+ tempcnn_rebuilt/ + stress_lstm/)
 #
 # Usage (from inside the cloned repo):
-#   sudo bash deploy/oracle_setup.sh <public-hostname>
-#   e.g.  sudo bash deploy/oracle_setup.sh 140-238-1-2.nip.io
-#   ('<dashed-ip>.nip.io' is a free public hostname that resolves to your IP,
-#    so Caddy can fetch a real HTTPS certificate without buying a domain.)
+#   sudo bash deploy/vm_setup.sh <public-hostname>
+#   e.g.  sudo bash deploy/vm_setup.sh 140-238-1-2.nip.io   (a free hostname)
+#   e.g.  sudo bash deploy/vm_setup.sh krishidrishti.me     (your own domain)
+#   ('<dashed-ip>.nip.io' resolves to your IP automatically, so Caddy can
+#    fetch a real HTTPS certificate without buying a domain.)
 #
 # Re-running is safe.
 set -euo pipefail
@@ -51,11 +53,14 @@ sudo -u krishi npm ci
 sudo -u krishi npm run build
 cd "$APP"
 
-echo "== 5/6  OS firewall (Oracle Ubuntu blocks 80/443 by default) =="
-# insert ACCEPT at the top of INPUT so it precedes Oracle's REJECT rule
+echo "== 5/6  OS firewall (Oracle Ubuntu blocks 80/443; a no-op elsewhere) =="
+# insert ACCEPT at the top of INPUT so it precedes any REJECT rule (Oracle
+# images ship one; DigitalOcean/GCP don't, so this is simply harmless there)
 iptables -I INPUT -p tcp --dport 80  -j ACCEPT
 iptables -I INPUT -p tcp --dport 443 -j ACCEPT
-netfilter-persistent save || (apt-get install -y iptables-persistent && netfilter-persistent save)
+netfilter-persistent save 2>/dev/null || \
+  (apt-get install -y iptables-persistent && netfilter-persistent save) || \
+  echo "  (no netfilter-persistent; rules apply for this boot)"
 
 echo "== 6/6  systemd service + Caddy =="
 cp "$APP/deploy/krishidrishti.service" /etc/systemd/system/
