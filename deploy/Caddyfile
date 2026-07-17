@@ -5,8 +5,10 @@
 #   sudo systemctl reload caddy
 #
 # Replace the domain with yours (its DNS A record must point at this VM).
-# For a quick test without a domain, use  :80  as the site address instead
-# (plain HTTP).
+# No domain? Use a free '<dashed-ip>.nip.io' hostname — it resolves to your
+# IP automatically and Caddy can still get a real Let's Encrypt certificate
+# for it. (oracle_setup.sh does this substitution for you.)
+# For plain-HTTP-only, use  :80  as the site address instead.
 
 krishidrishti.example.com {
 	encode gzip
