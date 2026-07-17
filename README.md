@@ -82,4 +82,4 @@ For frontend development with hot reload: `cd frontend && npm run dev` (Vite on 
 
 ## License & data
 
-Code © [Your Name]. AgriFieldNet ground reference data © Radiant Earth Foundation / IDinsight (CC-BY-4.0). Contains modified Copernicus Sentinel data. Weather from NASA POWER.
+Code © Harshul Aggarwal. AgriFieldNet ground reference data © Radiant Earth Foundation / IDinsight (CC-BY-4.0). Contains modified Copernicus Sentinel data. Weather from NASA POWER.
