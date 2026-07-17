@@ -54,7 +54,9 @@ cloudflared tunnel --url http://127.0.0.1:8000
 ```
 
 `cloudflared` prints a public https URL that anyone can open. The site is
-up while your PC is on.
+up while your PC is on. For a **fixed** URL (survives restarts), see:
+- **cloudflare_tunnel.md** — stable URL via a named tunnel (needs a domain)
+- **tailscale_funnel.md** — stable `*.ts.net` URL, free, no domain needed
 
 ## Notes
 
