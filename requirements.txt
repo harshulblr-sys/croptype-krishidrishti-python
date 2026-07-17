@@ -1,0 +1,15 @@
+# Runtime dependencies for the pipeline + web service (Python 3.10+)
+numpy
+pandas
+scikit-learn
+scikit-image
+lightgbm
+torch
+rasterio
+matplotlib
+Pillow
+joblib
+requests
+earthengine-api
+fastapi
+uvicorn

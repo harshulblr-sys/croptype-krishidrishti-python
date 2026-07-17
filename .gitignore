@@ -20,4 +20,9 @@ moisture_stress/
 __pycache__/
 node_modules/
 frontend/capture.jpg
+frontend/dist/
 *.log
+
+# docs assets are tracked even where the patterns above would exclude them
+!docs/*.pdf
+!docs/images/*.png

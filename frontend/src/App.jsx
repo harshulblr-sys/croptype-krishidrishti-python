@@ -271,8 +271,7 @@ export default function App() {
 
         <footer className="footer">
           <span>
-            ISRO PS-6 · Sentinel-1/2 via GEE · FAO-56 water balance · LightGBM +
-            LSTM
+            Sentinel-1/2 via GEE · FAO-56 water balance · LightGBM + LSTM
           </span>
           <button
             className="chip"

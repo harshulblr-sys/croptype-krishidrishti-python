@@ -40,10 +40,12 @@ from collections import defaultdict, deque
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 RUNS = os.path.join(ROOT, "aoi_runs")
+DIST = os.path.join(ROOT, "frontend", "dist")   # built React app (npm run build)
 SUPPORTED = (68.0, 19.0, 89.0, 32.5)          # keep in sync with aoi_run.py
 PILOTS = {
     "UP": (81.13, 27.07, 82.74, 28.33), "BIHAR": (87.20, 25.27, 88.05, 25.88),
@@ -284,7 +286,11 @@ def files(jid: str, path: str):
 
 @app.get("/", response_class=HTMLResponse)
 def index():
-    """Placeholder UI until the React/MapLibre frontend exists."""
+    """Serve the built React frontend (frontend/dist); dev test page fallback."""
+    idx = os.path.join(DIST, "index.html")
+    if os.path.exists(idx):
+        with open(idx, encoding="utf-8") as f:
+            return f.read()
     return """<!doctype html><meta charset="utf-8">
 <title>PS-6 AOI service</title>
 <style>body{font-family:system-ui;max-width:640px;margin:40px auto;padding:0 16px}
@@ -322,6 +328,11 @@ async function go(){
     if(s2.status==='failed')clearInterval(t);
   },2000)}
 </script>"""
+
+
+if os.path.isdir(os.path.join(DIST, "assets")):
+    app.mount("/assets", StaticFiles(directory=os.path.join(DIST, "assets")),
+              name="assets")
 
 
 def main():

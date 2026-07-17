@@ -1,8 +1,10 @@
 @echo off
-rem Start the PS-6 AOI service: FastAPI backend (:8000) + Vite frontend (:5173).
-rem Double-click this file, or run it from any terminal. Each server opens in
-rem its own window; close the windows (or Ctrl+C in them) to stop.
-start "PS6 backend :8000" cmd /k "cd /d %~dp0 && python aoi_server.py"
-start "PS6 frontend :5173" cmd /k "cd /d %~dp0frontend && dev.cmd"
-echo Backend  -> http://127.0.0.1:8000
-echo Frontend -> http://localhost:5173
+rem Start the PS-6 AOI service (production mode).
+rem One server does everything: FastAPI on :8000 serves the API, the built
+rem React frontend (frontend/dist) and all job outputs.
+rem Double-click this file; close the window (or Ctrl+C) to stop.
+rem
+rem Frontend development with hot reload instead: run frontend\dev.cmd
+rem (Vite on :5173, proxies /api to :8000).
+start "PS6 server :8000" cmd /k "cd /d %~dp0 && python aoi_server.py"
+echo Site + API -> http://127.0.0.1:8000
