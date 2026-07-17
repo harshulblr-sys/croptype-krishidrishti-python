@@ -31,7 +31,7 @@ certificate automatically. Done.
 
 ```bash
 # from the repo root (models must be present in runs/ first)
-docker build -f deploy/Dockerfile -t krishidrishti .
+docker build -t krishidrishti .
 docker run -d -p 8000:8000 \
   -v $PWD/gee_key.json:/app/gee_key.json:ro \
   -v krishi_runs:/app/aoi_runs \

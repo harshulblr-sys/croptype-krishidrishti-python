@@ -1,7 +1,8 @@
 # KrishiDrishti AOI service — container image (VM, Hugging Face Spaces, etc.)
 #
-# Build FROM THE REPO ROOT (the .dockerignore there keeps datasets out):
-#   docker build -f deploy/Dockerfile -t krishidrishti .
+# Build from the repo root (the .dockerignore keeps datasets out):
+#   docker build -t krishidrishti .
+# (Lives at the repo root because Hugging Face Docker Spaces require it here.)
 # Run:
 #   docker run -p 8000:8000 -e PORT=8000 \
 #     -v /path/to/gee_key.json:/app/gee_key.json:ro \
