@@ -38,8 +38,11 @@ docker run -d -p 8000:8000 \
   krishidrishti
 ```
 
-For HF Spaces: push the same tree to a Docker Space, set `PORT=7860`
-via Space settings, and add the key file content as a Space secret.
+For HF Spaces: create a Docker Space, use deploy/hf_space_README.md as the
+Space's README.md (its front-matter sets app_port: 8000), git-lfs track
+`*.joblib`, include runs/ model folders, and add the key file's JSON
+content as a Space secret named `GEE_KEY_JSON`. No local Docker needed —
+Hugging Face builds the image from the pushed repo.
 
 ## C. Your own PC + Cloudflare Tunnel (free, demo-grade)
 
