@@ -123,8 +123,8 @@ def main():
     for sub in ("chips", "s2raw", "s2reraw", "season"):
         os.makedirs(os.path.join(ws, sub), exist_ok=True)
 
-    import ee
-    ee.Initialize(project=gx.PROJECT)
+    import gee_auth
+    print("EE auth:", gee_auth.init(gx.PROJECT))
 
     # ---- pixel grid: UTM, 10 m, padded to a multiple of 256 ----
     lon0, lat0 = (w + e) / 2, (s + n) / 2

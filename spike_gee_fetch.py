@@ -44,9 +44,9 @@ def dekads():
 
 
 def main():
-    import ee
+    import gee_auth
     t_init = time.time()
-    ee.Initialize(project=PROJECT)
+    print("EE auth:", gee_auth.init(PROJECT))
     print(f"[init] {time.time() - t_init:.1f}s")
 
     # ---- AOI grid in UTM ----
