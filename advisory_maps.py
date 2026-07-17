@@ -31,9 +31,11 @@ MAPS = os.path.join(sc.OUT_DIR, "maps")
 LEVEL_COLORS = {-1: "#b8b3ab", 0: "#2e7d32", 1: "#f9a825", 2: "#ef6c00", 3: "#c62828"}
 LEVEL_NAMES = {-1: "Out of season", 0: "No stress", 1: "Watch",
                2: "Irrigation advised", 3: "Severe stress"}
-# fixed per-crop colors, index = sc.SCHEME position (matches the web UI)
-CROP_COLORS = ["#c98500", "#d95926", "#9085e9", "#898781",
-               "#199e70", "#008300", "#3987e5", "#d55181"]
+# fixed per-crop colors, index = sc.SCHEME position (matches the web UI).
+# Mustard is magenta so it separates cleanly from Wheat's amber on the map;
+# the rare "Other" class takes the orange slot instead.
+CROP_COLORS = ["#c98500", "#d55181", "#9085e9", "#898781",
+               "#199e70", "#008300", "#3987e5", "#d95926"]
 N_EXAMPLE_CHIPS = 6
 MOSAIC_MAX_PX = 1024          # downsample mosaics beyond this for the PNGs
 

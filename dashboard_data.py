@@ -138,8 +138,8 @@ def main():
             mosaics = json.load(f)
     # fixed per-crop colors (same as advisory_maps.CROP_COLORS / the web UI)
     crop_colors = {sc.SCHEME[i]: c for i, c in enumerate(
-        ["#c98500", "#d95926", "#9085e9", "#898781",
-         "#199e70", "#008300", "#3987e5", "#d55181"])}
+        ["#c98500", "#d55181", "#9085e9", "#898781",
+         "#199e70", "#008300", "#3987e5", "#d95926"])}
 
     # ---- representative water-balance schedule (median cell, per crop) ----
     from collections import Counter

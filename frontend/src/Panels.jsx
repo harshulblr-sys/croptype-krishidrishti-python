@@ -5,13 +5,13 @@ import { dashboardUrl, fileUrl } from "./api.js";
 // color follows the crop, never its rank in the list.
 export const CROP_COLORS = {
   Wheat: "#c98500",
-  Mustard: "#d95926",
+  Mustard: "#d55181", // magenta — separates from Wheat's amber on the map
   Lentil: "#9085e9",
   "No crop/Fallow": "#898781",
   Sugarcane: "#199e70",
   Maize: "#008300",
   Rice: "#3987e5",
-  Other: "#d55181",
+  Other: "#d95926",
 };
 
 const fmtPct = (x) => `${Math.round(x * 100)}%`;
