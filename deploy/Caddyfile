@@ -1,0 +1,21 @@
+# Caddy reverse proxy — automatic free HTTPS via Let's Encrypt.
+#
+# Install Caddy (Ubuntu):  https://caddyserver.com/docs/install
+#   sudo cp deploy/Caddyfile /etc/caddy/Caddyfile
+#   sudo systemctl reload caddy
+#
+# Replace the domain with yours (its DNS A record must point at this VM).
+# For a quick test without a domain, use  :80  as the site address instead
+# (plain HTTP).
+
+krishidrishti.example.com {
+	encode gzip
+
+	# Long-running job submissions + large GeoTIFF downloads
+	reverse_proxy 127.0.0.1:8000 {
+		transport http {
+			read_timeout 300s
+			write_timeout 300s
+		}
+	}
+}

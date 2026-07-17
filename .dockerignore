@@ -1,0 +1,23 @@
+# Whitelist build context: exclude everything, re-include only what the
+# image needs. Without this, docker build would upload the multi-GB datasets.
+*
+
+!requirements.txt
+!*.py
+!dashboard_template.html
+
+!frontend/
+frontend/node_modules/
+frontend/dist/
+frontend/capture.jpg
+
+!runs/
+runs/*
+!runs/final_classifier_rebuilt/
+!runs/tempcnn_rebuilt/
+!runs/stress_lstm/
+
+# never ship credentials or job outputs into the image
+gee_key.json
+*service*account*.json
+aoi_runs/

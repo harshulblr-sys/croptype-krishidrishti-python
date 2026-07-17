@@ -1,0 +1,29 @@
+# systemd unit — the OS runs the server: starts on boot, restarts on crash.
+#
+# Install (on the VM, assuming the project lives at /opt/krishidrishti with a
+# virtualenv at /opt/krishidrishti/venv):
+#   sudo cp deploy/krishidrishti.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now krishidrishti
+# Logs:  journalctl -u krishidrishti -f
+
+[Unit]
+Description=KrishiDrishti AOI service (FastAPI + pipeline)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=krishi
+WorkingDirectory=/opt/krishidrishti
+ExecStart=/opt/krishidrishti/venv/bin/python aoi_server.py --host 127.0.0.1 --port 8000
+Restart=on-failure
+RestartSec=5
+Environment=PYTHONUNBUFFERED=1
+# Path to the Earth Engine service-account key (once wired in):
+# Environment=GEE_KEY_FILE=/opt/krishidrishti/gee_key.json
+# Keep the pipeline from eating the whole box if something runs away:
+MemoryMax=6G
+
+[Install]
+WantedBy=multi-user.target

@@ -337,8 +337,9 @@ if os.path.isdir(os.path.join(DIST, "assets")):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--port", type=int, default=8000)
-    ap.add_argument("--host", default="127.0.0.1")
+    ap.add_argument("--port", type=int,
+                    default=int(os.environ.get("PORT", "8000")))
+    ap.add_argument("--host", default=os.environ.get("HOST", "127.0.0.1"))
     ap.add_argument("--workers", type=int, default=MAX_CONCURRENT,
                     help="max concurrent pipeline runs")
     args = ap.parse_args()
