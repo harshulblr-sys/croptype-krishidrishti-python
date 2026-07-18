@@ -123,6 +123,7 @@ def main():
     for sub in ("chips", "s2raw", "s2reraw", "season"):
         os.makedirs(os.path.join(ws, sub), exist_ok=True)
 
+    import ee
     import gee_auth
     print("EE auth:", gee_auth.init(gx.PROJECT))
 

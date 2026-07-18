@@ -374,6 +374,7 @@ def main():
         print("DRY RUN — no GEE calls made. Drop --dry-run to submit.")
         return
 
+    import ee
     import gee_auth
     print("EE auth:", gee_auth.init(PROJECT))
     submitted, skipped = 0, 0
