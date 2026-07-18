@@ -1,8 +1,8 @@
 # KrishiDrishti 🌾🛰️
 
-**Draw a box anywhere in northern India → per-field crop map, moisture stress, 8-day crop-water deficit and an irrigation advisory — in ~2–3 minutes.**
+**Draw a box anywhere in northern India → per-field crop map, moisture stress, 8-day crop-water deficit and an irrigation advisory — in ~4–5 minutes.**
 
-A full-stack AI + remote-sensing system built for ISRO Problem Statement 6 (AI-driven crop type, moisture-stress detection & irrigation advisory from optical + microwave satellite data), extended into a deployable web service.
+A full-stack AI + remote-sensing system built for ISRO Hackathon Problem Statement 6 (AI-driven crop type, moisture-stress detection & irrigation advisory from optical + microwave satellite data), extended into a deployable web service.
 
 ![Field-level crop-type map](docs/images/crop_map.png)
 *Field-level (10 m) crop-type map for a 9×8 km AOI in Uttar Pradesh — wheat (amber), mustard (magenta), sugarcane (teal), maize (green).*
@@ -19,7 +19,7 @@ A full-stack AI + remote-sensing system built for ISRO Problem Statement 6 (AI-d
 | **Satellite-only stress** | Causal LSTM Ks emulator (R² 0.96 vs FAO-56 on held-out chips) for weather-sparse operation |
 | **Web service** | Draw an AOI → GEE fetch (~40 s) → 11-stage pipeline → interactive dashboard + GeoTIFF/CSV downloads |
 
-**Accuracy (honest numbers):** test OA 0.78 / macro-F1 0.55 / κ 0.68; 5-fold chip-level CV OA ~0.73. Validated on the four AgriFieldNet pilot regions; everywhere else is explicitly badged *experimental*.
+**Accuracy:** test OA 0.78 / macro-F1 0.55 / κ 0.68; 5-fold chip-level CV OA ~0.73. Validated on the four AgriFieldNet pilot regions; everywhere else is explicitly badged *experimental*.
 
 📄 **Full write-up:** [PROJECT_REPORT.md](PROJECT_REPORT.md) · [PDF](docs/KrishiDrishti_Technical_Report.pdf)
 
