@@ -99,15 +99,6 @@
 
   <div class="kpis" id="kpis"></div>
 
-  <div class="note" style="margin:-6px 0 18px">
-    <b>Reading the numbers:</b> <b>Ks</b> is the FAO-56 crop water-stress factor
-    &mdash; 1.00 means the crop is fully watered, values below ~0.85 mean growth is
-    being slowed by lack of water. <b>MAE</b> (mean absolute error) is the average
-    gap between two estimates &mdash; smaller is better. <b>R&sup2;</b> measures how
-    well one estimate tracks another: 1.00 is perfect agreement, 0 is no better
-    than guessing the average, and a negative value means the two actively disagree.
-  </div>
-
   <div class="card" id="cropmap-card" style="display:none">
     <h2>Crop-type map <span class="pill">field-level, 10 m</span></h2>
     <div class="mosaic-wrap"><img id="cropmap-img" alt="Field-level crop-type map"></div>
@@ -190,7 +181,8 @@
         <div class="legend">
           <span><span class="sw" style="background:var(--et0)"></span>Ks &mdash; FAO-56 water balance</span>
           <span><span class="sw" style="background:var(--lv3)"></span>Ks &mdash; LSTM (satellite-only)</span>
-        </div></div>
+        </div>
+        <div class="note"><b>Ks</b> is the FAO-56 crop water-stress factor: 1.00 = the crop is fully watered; below ~0.85 its growth is being slowed by lack of water.</div></div>
       <div><div id="f-deficit"></div>
         <div class="legend">
           <span><span class="sw" style="background:var(--lv2)"></span>Water deficit (mm / 8 days)</span>
@@ -245,9 +237,6 @@
     [D.dekad_labels[lastPeak], `peak stress &mdash; <b>${advisedPeak}</b> fields advised`],
     [(D.sowing.detected_frac*100).toFixed(0) + "%", "of sowing dates observed from NDVI green-up"],
     [(D.deficit.season_total_m3/1e6).toFixed(1) + " Mm³", `season water deficit over <b>${Math.round(D.deficit.cropped_area_ha).toLocaleString()}</b> ha cropped`],
-    ["R² " + D.lstm.test.r2.toFixed(2),
-      `how closely the satellite-only AI stress estimate tracks the physics water balance (1.00 = perfect; average gap ${D.lstm.test.mae.toFixed(2)} Ks units)` +
-      (D.lstm.test.r2 < 0.5 ? `<br><span class="warn">low agreement here — the AI estimate is unreliable for this area/season; the advisory uses the water balance only</span>` : "")],
   ];
   $("#kpis").innerHTML = kpis.map(k =>
     `<div class="kpi"><div class="v">${k[0]}</div><div class="l">${k[1]}</div></div>`).join("");
