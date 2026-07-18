@@ -4,7 +4,7 @@
 
 *Built for ISRO Problem Statement 6 (AI-driven crop type, moisture stress detection & irrigation advisory using optical + microwave satellite data), and since extended into a deployable web service.*
 
-> Author: [Your Name] · [LinkedIn / GitHub links] · [Date]
+> Author: Harshul Aggarwal · July 2026
 
 ---
 
@@ -46,7 +46,7 @@ Every detection step is **causal** (no future dekads used), so the same pipeline
 
 **Extracted training corpus:** 1,151 chips of 256×256 px at 10 m (T=11 months), across Uttar Pradesh (537), Rajasthan (238), Odisha (200) and Bihar (176). Splits are **chip-level stratified 80/10/10** (stratum = region × rarest-present crop) so spatially-correlated pixels never leak across train/test.
 
-**Class consolidation:** 13 raw crops → 8 classes; minor crops (green pea, garlic, gram, coriander, …) fold into "Other". Rice remains its own class.
+**Class consolidation:** 13 raw crops → 8 classes; minor crops (green pea, garlic, gram, coriander, …) fold into "Other".
 
 ---
 
@@ -133,8 +133,6 @@ The training pipeline was parameterized end-to-end via environment variables, so
 | Irrigation advisory | 5-level per-field per-dekad, CSV + dashboard ribbon |
 | Dashboard | Self-contained HTML: KPIs, season timeline, demand-vs-rainfall, sowing histograms, per-field drill-downs |
 
-*(Insert 2–3 screenshots here: the draw-AOI web UI, the field-level crop map, the advisory dashboard.)*
-
 ---
 
 ## 7. Key Engineering Lessons
@@ -143,13 +141,11 @@ The training pipeline was parameterized end-to-end via environment variables, so
 2. **Raw bands beat clever indices** — after 20+ engineered-feature experiments (GLCM texture, phenology metrics, flowering indices, SAR entropy…), the only material win was feeding raw band-month values alongside the indices.
 3. **Physics + ML beats either alone** — the FAO-56 balance provides an interpretable, defensible advisory; the LSTM extends it to weather-sparse operation; fixed fusion rules keep the farmer-facing output auditable.
 4. **Latency lives in the slowest composite** — GEE `computePixels` wall-time is bounded by the slowest of ~40 parallel requests (~33 s), not AOI area, until the per-request payload cap forces tiling.
-5. **Honesty is a feature** — the UI labels unvalidated regions EXPERIMENTAL and the dashboard self-flags when the ML emulator disagrees with the physics; trust in an advisory product is earned by admitting limits.
 
 ---
 
 ## 8. Future Work
 
-- GEE **service-account** auth + cloud deployment (currently runs on personal credentials)
 - Cross-job composite cache keyed (bbox, month, product)
 - Field-delineation model to replace pseudo-field segmentation
 - Finer weather (IMD 0.25° / ERA5-Land 9 km); canal command-area rollups of per-field volumes
@@ -174,3 +170,8 @@ The training pipeline was parameterized end-to-end via environment variables, so
 ---
 
 *Stack: Python · PyTorch · LightGBM · Google Earth Engine · FastAPI · React · MapLibre GL · rasterio*
+
+---
+
+**Website:** https://harshul-pfs.tailde7c85.ts.net/
+**GitHub repo:** https://github.com/harshulblr-sys/croptype-krishidrishti-python

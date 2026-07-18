@@ -1,67 +1,35 @@
 # Deployment
 
-Three interchangeable paths — all end with the same server on port 8000.
+The public site runs from your own PC, exposed with a free **Tailscale
+Funnel** — a stable `https://<machine>.<tailnet>.ts.net` URL, no domain to
+buy, no hosting cost, HTTPS handled for you. Full step-by-step (install,
+enable Funnel, auto-start on boot): **[tailscale_funnel.md](tailscale_funnel.md)**.
 
-## A. Plain VM (recommended: Oracle Always Free / GCP / Hetzner)
-
-```bash
-# Ubuntu 22.04+, as root once:
-adduser --system --group --home /opt/krishidrishti krishi
-apt install -y python3-venv nodejs npm caddy
-
-# as the app user / in /opt/krishidrishti:
-git clone <your-repo-url> .
-python3 -m venv venv && venv/bin/pip install -r requirements.txt
-cd frontend && npm ci && npm run build && cd ..
-
-# copy the pieces that are NOT in git:
-#   runs/final_classifier_rebuilt/  runs/tempcnn_rebuilt/  runs/stress_lstm/
-#   gee_key.json   (Earth Engine service-account key)
-
-sudo cp deploy/krishidrishti.service /etc/systemd/system/
-sudo systemctl daemon-reload && sudo systemctl enable --now krishidrishti
-sudo cp deploy/Caddyfile /etc/caddy/Caddyfile   # edit the domain first
-sudo systemctl reload caddy
-```
-
-Point your domain's DNS A record at the VM — Caddy fetches the HTTPS
-certificate automatically. Done.
-
-## B. Docker (any container host, incl. Hugging Face Spaces)
-
-```bash
-# from the repo root (models must be present in runs/ first)
-docker build -t krishidrishti .
-docker run -d -p 8000:8000 \
-  -v $PWD/gee_key.json:/app/gee_key.json:ro \
-  -v krishi_runs:/app/aoi_runs \
-  krishidrishti
-```
-
-For HF Spaces: create a Docker Space, use deploy/hf_space_README.md as the
-Space's README.md (its front-matter sets app_port: 8000), git-lfs track
-`*.joblib`, include runs/ model folders, and add the key file's JSON
-content as a Space secret named `GEE_KEY_JSON`. No local Docker needed —
-Hugging Face builds the image from the pushed repo.
-
-## C. Your own PC + Cloudflare Tunnel (free, demo-grade)
+## Your own PC + Tailscale Funnel
 
 ```powershell
-# server side (already works today):
-start_servers.cmd            # or Task Scheduler "At startup"
-# tunnel side (one-time: winget install Cloudflare.cloudflared):
-cloudflared tunnel --url http://127.0.0.1:8000
+# 1. Server — serves the built frontend + API on :8000
+start_servers.cmd            # or auto-start via Task Scheduler (see below)
+
+# 2. Tunnel — one-time: winget install tailscale.tailscale, then log in
+tailscale funnel --bg 8000
+tailscale funnel status      # prints your public https://<machine>.<tailnet>.ts.net URL
 ```
 
-`cloudflared` prints a public https URL that anyone can open. The site is
-up while your PC is on. For a **fixed** URL (survives restarts), see:
-- **cloudflare_tunnel.md** — stable URL via a named tunnel (needs a domain)
-- **tailscale_funnel.md** — stable `*.ts.net` URL, free, no domain needed
+`--bg` persists the funnel, and the Tailscale service auto-starts on boot,
+so the URL survives restarts. Pair the server with a Task Scheduler
+"At log on" task (`run_server.cmd`) — see
+[tailscale_funnel.md](tailscale_funnel.md) step 4 — and the whole site comes
+back automatically after a reboot with no manual steps. The site is
+reachable while your PC is powered on.
 
 ## Notes
 
-- **Never** commit or bake `gee_key.json` into an image; mount or secret it.
-- The service currently authenticates with a personal EE login; switch to
-  the service account before exposing it publicly.
+- `gee_key.json` (the Earth Engine service-account key) stays local and
+  gitignored — never commit it.
 - GEE quota is per-project regardless of host; keep the job concurrency cap
-  (default 2) and per-IP limits enabled.
+  (default 2) and the per-IP rate limits enabled.
+
+> **Want an always-on cloud VM instead?** The repo still ships the pieces —
+> `vm_setup.sh`, `Dockerfile`, `krishidrishti.service`, `Caddyfile` — see
+> their header comments. This README documents the Tailscale setup in use.
