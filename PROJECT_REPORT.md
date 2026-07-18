@@ -1,6 +1,6 @@
 # KrishiDrishti — Satellite-Based Crop Mapping, Moisture-Stress Detection & Irrigation Advisory
 
-**A full-stack AI + remote-sensing system: draw a box anywhere in northern India → per-field crop map, growth-stage-aware moisture stress, 8-day crop-water deficit, and an irrigation advisory — in ~2–3 minutes.**
+**A full-stack AI + remote-sensing system: draw a box anywhere in northern India → per-field crop map, growth-stage-aware moisture stress, 8-day crop-water deficit, and an irrigation advisory — in ~2–5 minutes.**
 
 *Built for ISRO Hackathon Problem Statement 6 (AI-driven crop type, moisture stress detection & irrigation advisory using optical + microwave satellite data), and since extended into a deployable web service.*
 

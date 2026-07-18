@@ -241,7 +241,7 @@ export default function App() {
               {busy ? "Pipeline running…" : "Run analysis"}
             </button>
             <p className="muted small">
-              ~2–3 min for a fresh AOI (satellite compositing + 11-stage
+              ~2–5 min for a fresh AOI (satellite compositing + 11-stage
               pipeline). Already-computed AOIs return instantly.
             </p>
           </div>

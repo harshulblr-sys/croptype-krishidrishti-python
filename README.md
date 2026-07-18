@@ -1,6 +1,6 @@
 # KrishiDrishti 🌾🛰️
 
-**Draw a box anywhere in northern India → per-field crop map, moisture stress, 8-day crop-water deficit and an irrigation advisory — in ~4–5 minutes.**
+**Draw a box anywhere in northern India → per-field crop map, moisture stress, 8-day crop-water deficit and an irrigation advisory — in ~2–5 minutes.**
 
 A full-stack AI + remote-sensing system built for ISRO Hackathon Problem Statement 6 (AI-driven crop type, moisture-stress detection & irrigation advisory from optical + microwave satellite data), extended into a deployable web service.
 
